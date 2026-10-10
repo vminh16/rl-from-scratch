@@ -1,0 +1,11 @@
+numpy>=1.26
+matplotlib>=3.8
+
+[box2d]
+gymnasium[box2d]>=1.0
+
+[dev]
+pytest>=8
+
+[gym]
+gymnasium>=1.0

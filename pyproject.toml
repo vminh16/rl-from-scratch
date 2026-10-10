@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minirl"
+version = "0.1.0"
+description = "Thư viện RL tự viết cho lộ trình Embodied RL 2026–2028"
+requires-python = ">=3.10"
+# Chỉ những gì GĐ1 thật sự cần. Thêm thư viện khi một tuần nào đó cần tới nó.
+dependencies = [
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+# Cài kèm: pip install -e ".[dev]"
+dev = ["pytest>=8"]
+# Từ tuần 9 (CartPole): pip install -e ".[gym]"
+gym = ["gymnasium>=1.0"]
+# Từ tuần 12 (LunarLander): pip install -e ".[box2d]"
+box2d = ["gymnasium[box2d]>=1.0"]
+# PyTorch cố ý KHÔNG đặt ở đây: lệnh cài phụ thuộc hệ điều hành và phiên bản CUDA.
+# Cài riêng theo https://pytorch.org/get-started/locally/ (từ tuần 9).
+
+[tool.setuptools.packages.find]
+# Chỉ đóng gói thư viện minirl, bỏ qua weeks/, proofs/, capstone/.
+include = ["minirl*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
