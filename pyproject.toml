@@ -28,5 +28,5 @@ box2d = ["gymnasium[box2d]>=1.0"]
 include = ["minirl*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "weeks"]
 addopts = "-q"

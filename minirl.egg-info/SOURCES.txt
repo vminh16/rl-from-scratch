@@ -27,3 +27,7 @@ minirl/envs/tictactoe.py
 minirl/utils/logger.py
 minirl/utils/plotting.py
 minirl/utils/seeding.py
+tests/test_core.py
+tests/test_logger.py
+tests/test_plotting.py
+tests/test_w01_tictactoe.py
