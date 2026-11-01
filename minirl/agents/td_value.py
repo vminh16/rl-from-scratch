@@ -5,10 +5,14 @@ from minirl.core import Transition
 __all__ = ["AfterstateTD"] # Temporal Difference
 
 class AfterstateTD:
-	def __init__(self, alpha: float = 0.1, epsilon: float = 0.1, default_value: float = 0.5):
+	def __init__(self, alpha: float = 0.1, epsilon: float = 0.1, default_value: float = 0.5,
+				 learn_from_explore: bool = True):
 		self.alpha = alpha
 		self.epsilon = epsilon
 		self.default_value = default_value
+		# True: cập nhật cả sau nước đi khám phá. False: bỏ qua như S&B mục 1.5
+		self.learn_from_explore = learn_from_explore
+		self._explored = False # nước đi vừa rồi có phải nước khám phá không
 
 		# value table 
 		self.v_table: dict[tuple, float] = {} # sate and value of this state
@@ -44,7 +48,9 @@ class AfterstateTD:
 		empty_cell = np.where(obs_flatten == 0)[0]
 
 		# expore random in empty cell
+		self._explored = False
 		if not greedy and (rng.random() < self.epsilon):
+			self._explored = True
 			action = int(rng.choice(empty_cell))
 			return action
 
@@ -75,6 +81,11 @@ class AfterstateTD:
 		Output:
 			dict: {str. float} -> td_erorr
 		"""
+		# nước khám phá: không cập nhật, ngắt chuỗi để nước greedy kế tiếp bắt đầu lại
+		if self._explored and not self.learn_from_explore:
+			self.prev_afterstate = None
+			return {"td_error": 0.0}
+
 		curr_afterstate = self._make_afterstate(t.obs, t.action)
 		curr_v = self._get_v(curr_afterstate)
 		td_error = 0

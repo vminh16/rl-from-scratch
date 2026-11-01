@@ -8,5 +8,6 @@
   ],
   "episodes": 20000,
   "alpha": 0.1,
-  "epsilon": 0.1
+  "epsilon": 0.1,
+  "no_explore_update": false
 }

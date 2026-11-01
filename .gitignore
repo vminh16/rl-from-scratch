@@ -31,3 +31,18 @@ dist/
 # Temporary outputs / caches
 *.log
 uv.lock
+
+# Heavy data, models, and experiment results
+*.npy
+*.npz
+*.pkl
+*.pt
+*.pth
+*.h5
+*.parquet
+results_no_explore/
+weeks/*/results_no_explore/
+weeks/*/results/*/
+
+# Explicitly keep necessary deliverables
+!weeks/**/results/sweep.csv

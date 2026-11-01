@@ -59,7 +59,86 @@ def test_tictactoe_outcome_reported_on_finish():
     rng = make_rng(42)
     env = TicTacToe()
     env.reset(rng)
-    assert hasattr(env, "check_winner") or hasattr(env, "step")
+
+    # chơi đến khi hết ván, ván cuối phải có outcome hợp lệ
+    done = False
+    info = {}
+    while not done:
+        empty = np.where(env.board == 0)[0]
+        _, _, done, _, info = env.step(int(empty[0]))
+    assert info["outcome"] in ("win", "loss", "draw")
+
+
+def test_tictactoe_detects_all_8_winning_lines():
+    """3 hàng + 3 cột + 2 đường chéo, mỗi đường đều phải được nhận ra."""
+    from minirl.envs.tictactoe import TicTacToe, WIN_STATES
+
+    env = TicTacToe()
+    assert len(WIN_STATES) == 8
+    for line in WIN_STATES:
+        for player in (1, -1):
+            board = np.zeros(9, dtype=int)
+            board[list(line)] = player
+            assert env.check_win(board) == player
+
+    # bàn trống và bàn chưa đủ 3 quân thì không có người thắng
+    assert env.check_win(np.zeros(9, dtype=int)) == 0
+    assert env.check_win(np.array([1, 1, 0, 0, 0, 0, 0, 0, 0])) == 0
+
+
+def test_tictactoe_reachable_states_count():
+    """DFS từ bàn trống (X đi trước, dừng khi có kết quả) đếm đúng 5.478 trạng thái."""
+    from minirl.envs.tictactoe import TicTacToe
+
+    env = TicTacToe()
+    seen = set()
+
+    def dfs(board, player):
+        if board in seen:
+            return
+        seen.add(board)
+        if env.check_win(np.array(board)) != 0 or 0 not in board:
+            return
+        for i in range(9):
+            if board[i] == 0:
+                dfs(board[:i] + (player,) + board[i + 1:], -player)
+
+    dfs((0,) * 9, 1)
+    assert len(seen) == 5478
+
+
+def test_same_seed_gives_same_results():
+    """Cùng seed chạy hai lần phải ra đúng cùng chuỗi kết quả."""
+    from minirl.envs.tictactoe import TicTacToe
+    from minirl.agents.td_value import AfterstateTD
+    from minirl.core import run_episode
+    from minirl.utils.seeding import make_rng
+
+    def run(seed):
+        rng = make_rng(seed)
+        env, agent = TicTacToe(), AfterstateTD(alpha=0.1, epsilon=0.1)
+        return [run_episode(env, agent, rng)["outcome"] for _ in range(200)]
+
+    assert run(7) == run(7)
+    assert run(7) != run(8)  # seed khác thì khác
+
+
+def test_skip_explore_update_leaves_table_unchanged():
+    """learn_from_explore=False: nước khám phá không được làm thay đổi bảng V."""
+    from minirl.core import Transition
+    from minirl.agents.td_value import AfterstateTD
+
+    agent = AfterstateTD(alpha=0.1, epsilon=1.0, learn_from_explore=False)
+
+    class AlwaysLow:  # rng giả: luôn "khám phá" và chọn phần tử đầu
+        def random(self): return 0.0
+        def choice(self, x): return x[0]
+
+    obs = np.zeros(9, dtype=int)
+    action = agent.act(obs, AlwaysLow())
+    t = Transition(obs, action, 0.0, obs, False, False, {})
+    agent.update(t)
+    assert agent.v_table == {}
 
 
 # --- Tests for AfterstateTD Agent ---

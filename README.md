@@ -1,8 +1,43 @@
-# MiniRL: Reinforcement Learning from Scratch
+<div align="center">
 
-A clean, modular Reinforcement Learning library implemented from first principles for Embodied AI (2026–2028 roadmap). Built following Sutton & Barto (2018) specifications and developed with Test-Driven Development (TDD).
+# 🤖 MiniRL: Reinforcement Learning from Scratch
+
+<p><strong>Clean, modular Reinforcement Learning library implemented from first principles for Embodied AI (2026–2028 Roadmap)</strong></p>
+<p><em>Built strictly following Sutton & Barto (2018) specifications • Developed with Test-Driven Development (TDD)</em></p>
+
+<p>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
+  <a href="https://numpy.org/"><img src="https://img.shields.io/badge/NumPy-1.26+-013243?style=flat-square&logo=numpy&logoColor=white" alt="NumPy"></a>
+  <a href="https://matplotlib.org/"><img src="https://img.shields.io/badge/Matplotlib-3.8+-11557c?style=flat-square" alt="Matplotlib"></a>
+  <a href="https://docs.pytest.org/"><img src="https://img.shields.io/badge/Tests-93%20passed-2ea44f?style=flat-square&logo=pytest&logoColor=white" alt="Pytest"></a>
+  <img src="https://img.shields.io/badge/Roadmap-Embodied%20RL%202026--2028-orange?style=flat-square" alt="Embodied RL">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License"></a>
+</p>
+
+<p>
+  <a href="#overview">Overview</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#weekly-implementations">Weekly Implementations</a> •
+  <a href="#testing">Testing</a>
+</p>
+
+<table border="0">
+  <tr>
+    <td width="50%" align="center">
+      <strong>Week 01: Afterstate TD(0) Convergence</strong><br>
+      <img src="weeks/w01-tictactoe/figures/learning_curve.png" alt="Week 1 TD Learning" width="100%" />
+    </td>
+    <td width="50%" align="center">
+      <strong>Week 02: Multi-Armed Bandit Parameter Sweep</strong><br>
+      <img src="weeks/w02-bandits/figures/bandit_parameter_sweep.png" alt="Week 2 Parameter Sweep" width="100%" />
+    </td>
+  </tr>
+</table>
 
 ---
+
+</div>
 
 ## Table of Contents
 - [Overview](#overview)
@@ -69,9 +104,27 @@ pip install -e ".[dev]"
 
 ### Week 02: Multi-Armed Bandits
 
-- **Problem**: Stationary and non-stationary $k$-armed bandit testbeds.
-- **Method & Algorithm**: $\epsilon$-greedy action-value estimation, Upper Confidence Bound (UCB), and Gradient Bandit algorithms.
-- **Status**: In progress ([`weeks/w02-bandits/`](weeks/w02-bandits/)).
+- **Problem**: Stationary and non-stationary 10-armed bandit testbed ($q_*(a) \sim \mathcal{N}(0, 1)$).
+- **Method & 3 Core Algorithms**:
+  1. **$\epsilon$-Greedy**: Balances exploration and exploitation via action-value updates with sample-average or constant step-size ($\alpha$) for non-stationary tracking:
+     $$Q_{t+1}(A_t) \leftarrow Q_t(A_t) + \alpha \big[ R_t - Q_t(A_t) \big]$$
+  2. **Upper Confidence Bound (UCB1)**: Deterministic exploration guided by parameter uncertainty derived from Hoeffding's inequality:
+     $$A_t = \arg\max_a \left[ Q_t(a) + c \sqrt{\frac{\ln t}{N_t(a)}} \right]$$
+  3. **Gradient Bandit with Baseline**: Softmax preference learning with an incremental sample-average baseline $\bar{R}_t$ for variance reduction:
+     $$H_{t+1}(a) \leftarrow H_t(a) + \alpha (R_t - \bar{R}_t) \big[ \mathbb{I}_{a = A_t} - \pi_t(a) \big], \quad \pi_t(a) = \frac{e^{H_t(a)}}{\sum_b e^{H_t(b)}}$$
+- **Results**: Evaluated over 2,000 independent bandit tasks with 1,000 steps per run (Sutton & Barto 2018, Chapter 2):
+  - **UCB** ($c = 2$) achieves superior early exploration and asymptotic accuracy ($>80\%$ optimal action), outperforming standard $\epsilon$-greedy.
+  - **Gradient Bandit** converges to $>83\%$ optimal action; the baseline $\bar{R}_t$ proves crucial for stability under shifted reward distributions.
+  - **Parameter Sweep (Figure 2.6)** confirms characteristic inverted-U performance profiles across exploration rates, step sizes, and initial values.
+- **Artifacts & Evidence**:
+  - Environment: [`minirl/envs/bandit.py`](minirl/envs/bandit.py)
+  - Agents: [`minirl/agents/bandit_agents.py`](minirl/agents/bandit_agents.py)
+  - Experiment & Sweep: [`weeks/w02-bandits/run.py`](weeks/w02-bandits/run.py), [`weeks/w02-bandits/sweep.py`](weeks/w02-bandits/sweep.py)
+  - Mathematical Derivations: [`proofs/w02.pdf`](proofs/w02.pdf)
+  - Test Suite: [`weeks/w02-bandits/week02_test/`](weeks/w02-bandits/week02_test/)
+  - Weekly Report: [`weeks/w02-bandits/README.md`](weeks/w02-bandits/README.md)
+
+![Week 02 Parameter Sweep](weeks/w02-bandits/figures/bandit_parameter_sweep.png)
 
 ---
 
