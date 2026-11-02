@@ -22,18 +22,6 @@
   <a href="#testing">Testing</a>
 </p>
 
-<table border="0">
-  <tr>
-    <td width="50%" align="center">
-      <strong>Week 01: Afterstate TD(0) Convergence</strong><br>
-      <img src="weeks/w01-tictactoe/figures/learning_curve.png" alt="Week 1 TD Learning" width="100%" />
-    </td>
-    <td width="50%" align="center">
-      <strong>Week 02: Multi-Armed Bandit Parameter Sweep</strong><br>
-      <img src="weeks/w02-bandits/figures/bandit_parameter_sweep.png" alt="Week 2 Parameter Sweep" width="100%" />
-    </td>
-  </tr>
-</table>
 
 ---
 
